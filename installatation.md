@@ -167,6 +167,12 @@ DROP DATABASE test_installation;
 
 **✅ Résultat attendu :** 3 lignes avec id, nom et timestamp.
 
+## Validation TP1 - Installation
+- [ ] MySQL Server installé et fonctionnel
+- [ ] Utilisateur 'formation' créé avec les bons privilèges
+- [ ] Connexion possible via ligne de commande et outil graphique
+- [ ] Base de test créée et supprimée sans erreur
+
 ## Troubleshooting
 
 ### Si mysqlworkbench n'est pas installé
