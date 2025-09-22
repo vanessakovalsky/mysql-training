@@ -166,3 +166,10 @@ DROP DATABASE test_installation;
 ```
 
 **✅ Résultat attendu :** 3 lignes avec id, nom et timestamp.
+
+## Troubleshooting
+
+### Si mysqlworkbench n'est pas installé
+
+* Télécharger le binaire correspondant à votre système ici : https://dev.mysql.com/downloads/workbench/
+* Lancer l'installation
