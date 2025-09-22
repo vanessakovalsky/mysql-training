@@ -196,3 +196,12 @@ ORDER BY numero;
 ```
 
 **✅ Point de contrôle :** Les soldes de Sophie et Pierre sont inchangés, mais l'opération est enregistrée avec le statut CANCELLED.
+
+
+## Validation TP - Transactions
+- [ ] Base banque_formation créée avec contraintes d'intégrité
+- [ ] Transaction simple (dépôt) réalisée avec succès
+- [ ] Virement complexe avec COMMIT/ROLLBACK maîtrisé
+- [ ] Gestion des erreurs (solde insuffisant) implémentée
+- [ ] Différence entre InnoDB et MyISAM comprise
+
