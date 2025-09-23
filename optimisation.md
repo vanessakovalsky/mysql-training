@@ -1,5 +1,4 @@
-
-## TP 2 : Optimisation des paramètres du serveur MySQL
+# TP : Optimisation des paramètres du serveur MySQL
 **Durée estimée : 35-45 minutes**
 
 ### Objectifs
