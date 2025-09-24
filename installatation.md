@@ -42,8 +42,8 @@ sudo mysql_secure_installation
 **Répondez aux questions comme suit :**
 - `Validate password component?` → **Y** (Oui)
 - `Password validation policy` → **1** (MEDIUM)
-- `New password for root` → **FormationMySQL2024!**
-- `Re-enter new password` → **FormationMySQL2024!**
+- `New password for root` → **FormationMySQL2024!**   (optionnel il est possible selon votre OS qu'il n'y ait pas de mot de passe à définir pour root)
+- `Re-enter new password` → **FormationMySQL2024!**  (optionnel il est possible selon votre OS qu'il n'y ait pas de mot de passe à définir pour root)
 - `Remove anonymous users?` → **Y** (Oui)
 - `Disallow root login remotely?` → **N** (Non, pour la formation)
 - `Remove test database?` → **Y** (Oui)
@@ -51,9 +51,11 @@ sudo mysql_secure_installation
 
 **Étape 4 : Premier test de connexion**
 ```bash
-# Se connecter en tant que root
+# Si vous avez défini un mot de passe root Se connecter en tant que root
 mysql -u root -p
 # Saisir le mot de passe : FormationMySQL2024!
+# Dans le cas contraire
+sudo mysql -u root
 
 # Une fois connecté, exécuter :
 ```
