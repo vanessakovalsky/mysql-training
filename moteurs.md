@@ -228,7 +228,7 @@ GROUP BY niveau;
 START TRANSACTION;
 
 INSERT INTO logs_myisam (niveau, source, message, ip_address) 
-VALUES ('TEST', 'tp_formation', 'Test de transaction MyISAM - cette ligne devrait rester', '127.0.0.1');
+VALUES ('INFO', 'tp_formation', 'Test de transaction MyISAM - cette ligne devrait rester', '127.0.0.1');
 
 -- Vérifier que la ligne est immédiatement visible (pas de transaction)
 SELECT * FROM logs_myisam WHERE source = 'tp_formation';
