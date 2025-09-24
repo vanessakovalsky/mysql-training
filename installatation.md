@@ -181,3 +181,78 @@ DROP DATABASE test_installation;
 
 * Télécharger le binaire correspondant à votre système ici : https://dev.mysql.com/downloads/workbench/
 * Lancer l'installation
+
+### Mot de passe root perdu
+## Step 1: Stop MySQL completely
+
+Run the proper stop command for your OS:
+
+**Linux (systemd)**
+
+```bash
+sudo systemctl stop mysql
+# or
+sudo systemctl stop mysqld
+```
+
+**Linux (SysVinit)**
+
+```bash
+sudo service mysql stop
+```
+
+**Windows**
+Stop the MySQL service in `services.msc`.
+
+---
+
+## Step 2: Confirm MySQL has stopped
+
+```bash
+ps aux | grep mysqld
+```
+
+* You should **not see** the main `mysqld` process.
+* If it’s still running, kill it manually:
+
+```bash
+sudo kill -9 <PID>
+```
+
+---
+
+## Step 3: Start MySQL without password check
+
+```bash
+sudo mysqld_safe --skip-grant-tables &
+```
+
+---
+
+## Step 4: Reset root password
+
+```bash
+mysql -u root
+```
+
+Then inside MySQL shell:
+
+```sql
+FLUSH PRIVILEGES;
+ALTER USER 'root'@'localhost' IDENTIFIED BY 'NewStrongPassword!';
+FLUSH PRIVILEGES;
+EXIT;
+```
+
+---
+
+## Step 5: Restart MySQL normally
+
+```bash
+sudo systemctl stop mysql
+sudo systemctl start mysql
+```
+
+---
+
+💡 **Tip:** If you don’t want to stop MySQL, you can also reset the root password using **`ALTER USER` directly** if you have another user with sufficient privileges.
