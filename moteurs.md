@@ -118,53 +118,133 @@ VALUES (1, 'Produit gratuit', 1, -5.00);
 CREATE TABLE logs_myisam (
     id INT PRIMARY KEY AUTO_INCREMENT,
     date_log TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    niveau ENUM('INFO', 'backup_system', 'Sauvegarde quotidienne terminée avec succès', '127.0.0.1', 'mysqldump'),
-('DEBUG', 'performance', 'Temps de réponse moyen: 0.25ms sur les 1000 dernières requêtes', '127.0.0.1', 'MySQL Monitor'),
-('ERROR', 'web_server', 'Erreur 500 - Impossible de se connecter à la base de données', '192.168.1.200', 'Apache/2.4.41'),
-('WARNING', 'security', 'Tentative de connexion depuis une IP suspecte bloquée', '203.0.113.1', 'Unknown'),
-('INFO', 'application', 'Nouveau utilisateur enregistré avec succès', '192.168.1.150', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36');
+    niveau ENUM('INFO', 'WARNING', 'ERROR', 'DEBUG') DEFAULT 'INFO',
+    source VARCHAR(50) NOT NULL,
+    message TEXT NOT NULL,
+    ip_address VARCHAR(45),
+    user_agent TEXT,
+    session_id VARCHAR(64),
+    
+    -- Index pour recherches rapides
+    INDEX idx_date (date_log),
+    INDEX idx_niveau (niveau),
+    INDEX idx_source (source),
+    INDEX idx_session (session_id),
+    
+    -- Index FULLTEXT pour recherche textuelle (spécificité MyISAM)
+    FULLTEXT KEY ft_message (message),
+    FULLTEXT KEY ft_user_agent (user_agent),
+    FULLTEXT KEY ft_message_agent (message, user_agent)
+    
+) ENGINE=MyISAM COMMENT='Table de logs avec recherche full-text';
 
--- Vérifier l'insertion
+-- Vérifier la structure
+SHOW CREATE TABLE logs_myisam\G;
+
+```
+
+**Étape 2 : Insérer des données de test dans MyISAM**
+
+```sql
+-- Insérer des logs de test variés
+INSERT INTO logs_myisam (niveau, source, message, ip_address, user_agent, session_id) VALUES
+('INFO', 'web_server', 'Connexion utilisateur réussie pour user123', '192.168.1.100', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36', 'sess_abc123'),
+('WARNING', 'database', 'Requête lente détectée: SELECT * FROM large_table WHERE col LIKE "%pattern%"', '127.0.0.1', 'MySQL Workbench 8.0', 'sess_db001'),
+('ERROR', 'auth_system', 'Tentative de connexion échouée - mot de passe incorrect pour admin', '192.168.1.50', 'curl/7.68.0', 'sess_hack01'),
+('INFO', 'backup_system', 'Sauvegarde quotidienne terminée avec succès - 2.3GB sauvegardés', '127.0.0.1', 'mysqldump/8.0.28', 'sess_backup'),
+('DEBUG', 'performance', 'Temps de réponse moyen: 0.25ms sur les 1000 dernières requêtes', '127.0.0.1', 'MySQL Monitor v2.1', 'sess_perf01'),
+('ERROR', 'web_server', 'Erreur 500 - Impossible de se connecter à la base de données MySQL', '192.168.1.200', 'Apache/2.4.41 (Ubuntu) PHP/7.4.3', 'sess_web500'),
+('WARNING', 'security', 'Tentative de connexion depuis une IP suspecte bloquée automatiquement', '203.0.113.1', 'Unknown/Suspicious', 'sess_sec001'),
+('INFO', 'application', 'Nouveau utilisateur enregistré avec succès - ID: 1547', '192.168.1.150', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36', 'sess_reg123'),
+('ERROR', 'payment', 'Échec du paiement - carte expirée pour transaction T789456', '192.168.1.175', 'Mobile App v3.2.1', 'sess_pay789'),
+('INFO', 'cache', 'Cache vidé avec succès - 1247 entrées supprimées', '127.0.0.1', 'Redis Cache Manager', 'sess_cache1'),
+('WARNING', 'disk_space', 'Espace disque faible sur /var/log - 85% utilisé', '127.0.0.1', 'System Monitor', 'sess_disk01'),
+('DEBUG', 'api', 'Appel API réussi vers service externe - latence 142ms', '192.168.1.180', 'Internal API Client v1.0', 'sess_api001');
+
+-- Vérifier les données insérées
 SELECT COUNT(*) as total_logs FROM logs_myisam;
+
+-- Voir quelques exemples
+SELECT niveau, source, LEFT(message, 60) as message_extrait, ip_address
+FROM logs_myisam 
+ORDER BY date_log DESC 
+LIMIT 5;
 ```
 
 **Étape 3 : Test de la recherche FULLTEXT**
 ```sql
--- Recherche dans les messages contenant "connexion"
-SELECT id, niveau, source, message, date_log
+-- Test 1: Recherche dans les messages contenant "connexion"
+SELECT 
+    niveau,
+    source,
+    message,
+    ip_address,
+    date_log
 FROM logs_myisam
 WHERE MATCH(message) AGAINST('connexion' IN NATURAL LANGUAGE MODE)
 ORDER BY date_log DESC;
 
--- Recherche avec score de pertinence
-SELECT id, niveau, source, message, 
-       MATCH(message) AGAINST('base données' IN NATURAL LANGUAGE MODE) as score
+-- Test 2: Recherche avec score de pertinence
+SELECT 
+    niveau,
+    source,
+    LEFT(message, 80) as message,
+    MATCH(message) AGAINST('base données MySQL' IN NATURAL LANGUAGE MODE) as score
 FROM logs_myisam
-WHERE MATCH(message) AGAINST('base données' IN NATURAL LANGUAGE MODE)
+WHERE MATCH(message) AGAINST('base données MySQL' IN NATURAL LANGUAGE MODE)
 ORDER BY score DESC;
 
--- Recherche booléenne
-SELECT id, niveau, source, message
+-- Test 3: Recherche booléenne avancée
+SELECT 
+    niveau,
+    source,
+    LEFT(message, 60) as message,
+    ip_address
 FROM logs_myisam
 WHERE MATCH(message, user_agent) AGAINST('+MySQL -Apache' IN BOOLEAN MODE);
+
+-- Test 4: Recherche avec wildcard
+SELECT 
+    niveau,
+    source,
+    message
+FROM logs_myisam
+WHERE MATCH(message) AGAINST('sauvegard*' IN BOOLEAN MODE);
+
+-- Test 5: Recherche combinée avec conditions normales
+SELECT 
+    niveau,
+    COUNT(*) as nb_occurrences,
+    GROUP_CONCAT(DISTINCT source) as sources
+FROM logs_myisam
+WHERE MATCH(message) AGAINST('erreur connexion échec' IN NATURAL LANGUAGE MODE)
+  AND niveau IN ('ERROR', 'WARNING')
+GROUP BY niveau;
 ```
 
 **Étape 4 : Test des limitations MyISAM**
 ```sql
--- MyISAM ne supporte PAS les transactions
+-- Test: MyISAM ne supporte PAS les transactions
 START TRANSACTION;
 
-INSERT INTO logs_myisam (niveau, source, message) 
-VALUES ('TEST', 'formation', 'Test transaction MyISAM');
+INSERT INTO logs_myisam (niveau, source, message, ip_address) 
+VALUES ('TEST', 'tp_formation', 'Test de transaction MyISAM - cette ligne devrait rester', '127.0.0.1');
 
--- Même avec ROLLBACK, l'insertion est persistante
+-- Vérifier que la ligne est immédiatement visible (pas de transaction)
+SELECT * FROM logs_myisam WHERE source = 'tp_formation';
+
+-- Même avec ROLLBACK, l'insertion MyISAM est persistante
 ROLLBACK;
 
--- Vérifier que la ligne est bien présente
-SELECT * FROM logs_myisam WHERE source = 'formation';
+-- Vérifier que la ligne est toujours là
+SELECT COUNT(*) as lignes_test FROM logs_myisam WHERE source = 'tp_formation';
+-- Résultat attendu : 1 (la ligne reste malgré le ROLLBACK)
 
--- Nettoyer
-DELETE FROM logs_myisam WHERE source = 'formation';
+-- Nettoyer pour la suite
+DELETE FROM logs_myisam WHERE source = 'tp_formation';
+
+-- Démonstration du verrouillage au niveau table
+-- (Plus difficile à montrer en solo, mais MyISAM verrouille toute la table lors d'écritures)
 ```
 
 ---
