@@ -66,7 +66,7 @@ SHOW VARIABLES LIKE 'local_infile';
 SELECT @@sql_mode;
 
 -- Modifier le mode SQL pour la session
-SET SESSION sql_mode = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER';
+SET SESSION sql_mode = 'STRICT_TRANS_TABLES';
 
 -- Vérifier le changement
 SELECT @@sql_mode;
