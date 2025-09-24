@@ -258,7 +258,7 @@ CREATE TABLE sessions_memory (
     session_id VARCHAR(128) PRIMARY KEY,
     user_id INT NOT NULL,
     username VARCHAR(50),
-    data TEXT,
+    data VARCHAR(1000),
     ip_address VARCHAR(45),
     derniere_activite TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     
