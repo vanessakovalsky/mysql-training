@@ -238,7 +238,7 @@ BEGIN
     END IF;
     
     -- Validation du format du numéro de commande
-    IF NEW.numero_commande NOT REGEXP '^[A-Z0-9-]+ THEN
+    IF NEW.numero_commande NOT REGEXP '^[A-Z0-9-]+' THEN
         SIGNAL SQLSTATE '45000' 
         SET MESSAGE_TEXT = 'Le numéro de commande ne doit contenir que des lettres, chiffres et tirets';
     END IF;
