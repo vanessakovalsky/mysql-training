@@ -11,6 +11,8 @@
 
 **Étape 1 : Explorer les tablespaces existants**
 ```sql
+USE information_schema;
+
 -- Voir les fichiers de données
 SELECT 
     TABLESPACE_NAME,
