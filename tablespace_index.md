@@ -94,12 +94,11 @@ CREATE TABLE temp_calculs (
 -- Voir la répartition des tables par tablespace
 SELECT 
     t.TABLE_NAME,
-    t.TABLESPACE_NAME,
     t.TABLE_ROWS,
     ROUND((t.DATA_LENGTH + t.INDEX_LENGTH) / 1024 / 1024, 2) as SIZE_MB
 FROM INFORMATION_SCHEMA.TABLES t
 WHERE t.TABLE_SCHEMA = 'gestion_tablespaces'
-ORDER BY t.TABLESPACE_NAME, t.TABLE_NAME;
+ORDER BY t.TABLE_NAME;
 ```
 
 ---
