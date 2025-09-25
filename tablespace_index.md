@@ -11,14 +11,6 @@
 
 **Étape 1 : Explorer les tablespaces existants**
 ```sql
--- Voir les tablespaces système
-SELECT 
-    TABLESPACE_NAME,
-    ENGINE,
-    EXTENT_SIZE,
-FROM INFORMATION_SCHEMA.TABLESPACES
-ORDER BY TABLESPACE_NAME;
-
 -- Voir les fichiers de données
 SELECT 
     TABLESPACE_NAME,
@@ -26,7 +18,6 @@ SELECT
     FILE_TYPE,
     TOTAL_EXTENTS * EXTENT_SIZE / 1024 / 1024 as SIZE_MB
 FROM INFORMATION_SCHEMA.FILES
-WHERE FILE_TYPE = 'DATAFILE'
 ORDER BY TABLESPACE_NAME;
 ```
 
