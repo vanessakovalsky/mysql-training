@@ -171,10 +171,6 @@ CREATE INDEX idx_client_statut ON commandes_production(client_id, statut);
 -- Index sur la date pour les recherches par période
 CREATE INDEX idx_date_montant ON commandes_production(date_commande, montant);
 
--- Index partiel pour les commandes actives uniquement
-CREATE INDEX idx_commandes_actives ON commandes_production(date_commande, client_id)
-WHERE statut IN ('NOUVELLE', 'TRAITEE', 'EXPEDIEE');
-
 -- Voir les index créés
 SHOW INDEX FROM commandes_production;
 ```
@@ -192,11 +188,6 @@ FROM commandes_production
 WHERE date_commande BETWEEN '2024-01-01' AND '2024-01-15'
 GROUP BY client_id;
 
--- Test de l'index partiel
-EXPLAIN SELECT * FROM commandes_production 
-WHERE date_commande = '2024-01-10' 
-  AND client_id = 103 
-  AND statut = 'TRAITEE';
 ```
 
 **Étape 5 : Analyse détaillée des index**
