@@ -63,8 +63,10 @@ sudo chown -R mysql:mysql /var/run/mysqld-slave
 # Initialiser l'instance esclave
 mysqld --defaults-file=/etc/mysql/mysql.conf.d/mysqld-slave.cnf --initialize-insecure --user=mysql
 
+sudo mkdir -p /var/lib/mysql-slave
+
 # Démarrer l'instance esclave
-sudo mysqld --defaults-file=/etc/mysql/mysql.conf.d/mysqld-slave.cnf --user=mysql --daemonize
+mysqld --defaults-file=/etc/mysql/mysql.conf.d/mysqld-slave.cnf --user=mysql --daemonize
 
 # Vérifier que l'esclave est démarré
 ps aux | grep mysqld
