@@ -12,7 +12,6 @@
 **Étape 1 : Créer une seconde instance MySQL (simulation)**
 ```bash
 # Créer les répertoires pour l'instance esclave
-sudo mkdir -p /var/lib/mysql-slave
 sudo mkdir -p /var/log/mysql-slave
 sudo mkdir -p /var/run/mysqld-slave
 
@@ -62,7 +61,7 @@ sudo chown -R mysql:mysql /var/run/mysqld-slave
 **Étape 2 : Initialiser l'instance esclave**
 ```bash
 # Initialiser l'instance esclave
-sudo mysqld --defaults-file=/etc/mysql/mysql.conf.d/mysqld-slave.cnf --initialize-insecure --user=mysql
+mysqld --defaults-file=/etc/mysql/mysql.conf.d/mysqld-slave.cnf --initialize-insecure --user=mysql
 
 # Démarrer l'instance esclave
 sudo mysqld --defaults-file=/etc/mysql/mysql.conf.d/mysqld-slave.cnf --user=mysql --daemonize
